@@ -1,0 +1,19 @@
+!pip install -U torch torchaudio transformers accelerate
+
+import torch, torchaudio
+from transformers import AutoProcessor, MusicgenForConditionalGeneration
+
+MODEL = "facebook/musicgen-small"
+processor = AutoProcessor.from_pretrained(MODEL)
+model = MusicgenForConditionalGeneration.from_pretrained(MODEL)
+
+prompt = "An Indian classical music performance with sitar and tabla, gentle rythm and melodic improvisation."
+inputs = processor(text = [prompt], return_tensors = "pt")
+model.generation_config.do_sample = True
+model.generation_config.guidance_scale = 3.0  
+model.generation_config.max_new_tokens = 50 * 18  
+
+audio = model.generate(**inputs)  
+sr = model.config.audio_encoder.sampling_rate
+torchaudio.save("text_music.wav", audio[0].cpu(), sr)
+print("Saved text_music.wav")
