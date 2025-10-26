@@ -17,3 +17,26 @@ audio = model.generate(**inputs)
 sr = model.config.audio_encoder.sampling_rate
 torchaudio.save("text_music.wav", audio[0].cpu(), sr)
 print("Saved text_music.wav")
+
+# B
+import torch, torchaudio
+from transformers import AutoProcessor, MusicgenForConditionalGeneration
+
+MODEL = "facebook/musicgen-small"
+processor = AutoProcessor.from_pretrained(MODEL)
+model = MusicgenForConditionalGeneration.from_pretrained(MODEL)
+
+prompt = "Emotional strings over soft ambient pads with birdsong and distant children's laughter — nostalgic and heartwarming."
+guide, sr_in = torchaudio.load("New-Beginnings-chosic.com_.wav") 
+sr = model.config.audio_encoder.sampling_rate
+if sr_in != sr: guide = torchaudio.functional.resample(guide, sr_in, sr)
+
+inputs = processor(text = [prompt], return_tensors = "pt")
+model.generation_config.do_sample = True
+model.generation_config.guidance_scale = 3.0  # creativity vs. prompt adhere
+model.generation_config.max_new_tokens = 50 * 18  # ~50 tokens/sec -> ~18s
+
+audio = model.generate(**inputs)  
+sr = model.config.audio_encoder.sampling_rate
+torchaudio.save("text_music.wav", audio[0].cpu(), sr)
+print("Saved melody_music.wav")
