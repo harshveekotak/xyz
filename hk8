@@ -27,6 +27,7 @@ processor = AutoProcessor.from_pretrained(MODEL)
 model = MusicgenForConditionalGeneration.from_pretrained(MODEL)
 
 prompt = "Emotional strings over soft ambient pads with birdsong and distant children's laughter — nostalgic and heartwarming."
+
 guide, sr_in = torchaudio.load("New-Beginnings-chosic.com_.wav") 
 sr = model.config.audio_encoder.sampling_rate
 if sr_in != sr: guide = torchaudio.functional.resample(guide, sr_in, sr)
